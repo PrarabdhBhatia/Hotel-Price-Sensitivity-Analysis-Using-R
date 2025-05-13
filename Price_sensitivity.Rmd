@@ -1,0 +1,421 @@
+---
+title: "Expedia Case Analysis on Customer Sensitivity to Hotel Price Changes"
+author: "Prarabdh Bhatia"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Introduction**
+
+The analysis involved examining how changes in hotel prices affect booking likelihood and the number of nights booked. Several models were used to quantify this relationship, and coefficients were interpreted to express the percentage change in booking likelihood or nights booked for a $100 increase in price. The key results and insights are summarized below.
+
+**Price Sensitivity Across Models**
+
+1. Diagram: Model 1A (Booking Likelihood):  
+
+   - The coefficient for `PricePerNight` is -0.0007498. This implies that for every $1 increase in price, the booking likelihood decreases by 0.07498%.  
+   
+   
+        −0.0007498×100=−0.07498 or −7.498%−0.0007498×100=−0.07498 or −7.498%
+        
+        
+        
+   - Therefore, for a $100 increase in price, the likelihood of a booking decreases by 7.498%.
+
+2.  Diagram: Model 1B (Booking Likelihood):  
+
+   - The coefficient is -0.000760, meaning that a $1 increase in price reduces booking likelihood by 0.076%. 
+   
+         −0.000760×100=−0.0760 or −7.60%−0.000760×100=−0.0760 or −7.60% 
+         
+   - For a $100 price increase, the reduction in booking likelihood is 7.60%.
+
+3.  Diagram: Model 1C (Booking Likelihood):  
+
+   - With a coefficient of -0.0008138, the booking likelihood decreases by 8.138% for a $100 increase in price.
+
+	     −0.0008138×100=−0.08138 or −8.138%−0.0008138×100=−0.08138 or −8.138%
+
+4.  Diagram: Model 2A (Nights Booked):  
+
+   - The coefficient is -0.002891, indicating that a $1 increase in price reduces the number of nights booked by 0.2891%.  
+   
+      −0.002891×100=−0.2891 or −28.91%−0.002891×100=−0.2891 or −28.91%
+
+   - For a $100 price increase, the reduction in nights booked is 28.91%.
+
+5.  Diagram: Model 2B (Nights Booked):  
+
+   - With a coefficient of -0.0029206, the number of nights booked decreases by 29.21% for a $100 increase in price.
+
+    	−0.0029206×100=−0.2921 or −29.21%−0.0029206×100=−0.2921 or −29.21%
+
+6.  Diagram: Model 2C (Nights Booked):  
+
+   - The coefficient is -0.003078, meaning that a $100 price increase reduces the number of nights booked by 30.78%.
+
+     −0.003078×100=−0.3078 or −30.78%−0.003078×100=−0.3078 or −30.78%
+
+**Regional and Income-Based Price Sensitivity**
+
+The analysis explored how price sensitivity varies by customer income level and travel destination:
+
+**By Region**
+
+1. Hawaii:  
+   - The price sensitivity coefficient is -0.000518, meaning that customers in Hawaii are less responsive to price increases compared to other regions. A $100 price increase reduces booking likelihood by 5.18%.
+
+2. Las Vegas and Miami:  
+   - These regions are highly sensitive to price changes, with coefficients of -0.00109 and -0.00125, respectively. For a $100 price increase, booking likelihood drops by 10.9% in Las Vegas and 12.5% in Miami.
+
+3. Washington DC:  
+   - This region shows the least sensitivity to price changes, with a coefficient of -0.000185, corresponding to a 1.85% reduction in booking likelihood for a $100 increase in price.
+
+By Customer Income  
+1. Low-Income Customers:  
+   - The coefficient is -0.00338, indicating that these customers are highly sensitive to price changes. A $100 increase leads to a 33.8% reduction in the number of nights booked.
+
+2. Medium-Income Customers:  
+   - With a coefficient of -0.00303, these customers are somewhat less sensitive, with a 30.3% decrease in nights booked for a $100 price increase.
+
+3. High-Income Customers:  
+   - High-income customers are the least sensitive to price changes, with a coefficient of -0.00257, resulting in a 25.7% reduction in nights booked for a $100 price increase.
+
+
+**Comparison with Observational Estimates**
+
+When comparing the results of the experimental models with observational estimates, the experimental data generally indicates higher price sensitivity. This suggests that customers might be more responsive to price changes in controlled environments, or that previous models may have underestimated the effect of price increases. Such findings highlight the importance of using experimental data to capture a more accurate understanding of customer behavior.
+
+**Implications for Pricing Strategy** 
+
+The results suggest that Expedia can leverage this information to develop region-specific and income-targeted pricing strategies:
+
+Dynamic Pricing: The data indicates that in regions like Las Vegas and Miami, where price sensitivity is higher, Expedia can adopt a more cautious pricing strategy, particularly during peak travel seasons.
+Targeted Discounts for Low-Income Customers: Offering discounts or promotions to low-income customers could help retain this price-sensitive segment, particularly in regions like Miami and Las Vegas.
+Opportunities in Low-Sensitivity Markets: In regions such as Washington DC, and for high-income customers, there is more flexibility to increase prices without drastically affecting bookings.
+
+**Limitations and Future Directions**
+
+While the models provide valuable insights, there are limitations:
+Seasonality: The analysis does not account for seasonal fluctuations, which could impact price sensitivity. Future studies could include a time-based variable to better capture these effects.
+Customer Behavior Segmentation: Additional segmentation by customer behavior (e.g., loyalty program membership, frequent travelers) could enhance the understanding of price sensitivity.
+External Factors: Events, such as holidays or special events in certain regions, could affect bookings but were not included in the models. Incorporating such factors would provide a more comprehensive analysis.
+
+**Conclusion**
+
+Overall, the findings highlight that price sensitivity varies significantly by both destination and customer income. 
+
+Regions like Las Vegas and Miami, and lower-income customers, show higher sensitivity to price changes, suggesting that pricing strategies should be region- and demographic-specific. 
+
+This information can help Expedia optimize pricing to cater to different customer segments, balancing between maximized bookings and revenue.
+
+
+```{r}
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#install.packages("psych")
+#install.packages("moments")
+#install.packages("PASWR2")
+#install.packages("pwr")
+#install.packages("EnvStats")
+#install.packages("OneTwoSamples")
+#install.packages("lsr")
+#install.packages("tidyr")
+#install.packages("reshape2")
+#install.packages("DescTools")
+#install.packages("MASS")
+
+library(dplyr)
+library(ggplot2)
+library(DescTools)
+library(MASS)
+```
+
+```{r}
+load("/Users/prarabdhbhatia/Desktop/Projects/Price_sensitivity/expedia_dataset.Rdata")
+head(Expedia)
+```
+
+# Summary of Expedia Data Overall 
+
+```{r}
+summary(Expedia)
+```
+
+# Boxplot (A)
+
+```{r}
+ggplot(Expedia, aes(x = Region, y = PricePerNight, fill = Region)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Price Per Night by Region",
+       x = "Region",
+       y = "Price per night") +
+  theme_minimal()
+
+# Calculate means for each region
+las_vegas_mean <- mean(Expedia$PricePerNight[Expedia$Region == "Las Vegas"], na.rm = TRUE)
+hawaii_mean <- mean(Expedia$PricePerNight[Expedia$Region == "Hawaii"], na.rm = TRUE)
+miami_mean <- mean(Expedia$PricePerNight[Expedia$Region == "Miami"], na.rm = TRUE)
+washington_mean <- mean(Expedia$PricePerNight[Expedia$Region == "Washinton DC"], na.rm = TRUE)
+
+# Create a data frame with the results
+mean_table <- data.frame(
+  Region = c("Las Vegas", "Hawaii", "Miami", "Washington DC"),
+  MeanPricePerNight = c(las_vegas_mean, hawaii_mean, miami_mean, washington_mean)
+)
+
+# Display the table
+print(mean_table)
+
+```
+
+# Boxplot (B)
+
+```{r}
+Expedia <- Expedia %>%
+  mutate(IncomeGroup = cut(UserIncome, 
+                           breaks = quantile(UserIncome, probs = c(0, 0.33, 0.66, 1), na.rm = TRUE),
+                           labels = c("Low", "Medium", "High"),
+                           include.lowest = TRUE))
+
+ggplot(Expedia, aes(x = IncomeGroup, y = PricePerNight, fill = IncomeGroup)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Price Per Night by User Income",
+       x = "UserIncome",
+       y = "Price per night") +
+  theme_minimal()
+```
+
+# Boxplot (C)
+
+```{r}
+Expedia <- Expedia %>%
+  mutate(IncomeGroup = cut(UserIncome, 
+                           breaks = quantile(UserIncome, probs = c(0, 0.33, 0.66, 1), na.rm = TRUE),
+                           labels = c("Low", "Medium", "High"),
+                           include.lowest = TRUE))
+
+ggplot(Expedia, aes(x = IncomeGroup, y = PricePerNight, fill = IncomeGroup)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Price Per Night by User Income and Region",
+       x = "UserIncome",
+       y = "Price per night") +
+  theme_minimal()+
+  facet_wrap(~Region)
+```
+
+# -----------`Booked?` as Dependent Variable-----------
+
+# Graph (1a)
+
+```{r}
+ggplot(Expedia, aes(x = PricePerNight, y = `Booked?`, color = Region)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Booking Likelihood vs Price Per Night by Region",
+    x = "Price Per Night",
+    y = "Booking Likelihood (0 or 1)"
+  )
+
+```
+
+# Graph (1b)
+
+```{r}
+data_grouped <- Expedia %>%
+  group_by(PricePerNight, Region) %>%
+  summarise(AverageBooked = mean(`Booked?`, na.rm = TRUE))
+
+ggplot(data_grouped, aes(x = PricePerNight, y = AverageBooked, color = Region)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +  # Add a linear regression line without the confidence interval
+  labs(title = "Booking Likelihood by Price Per Night for Each Region",
+       x = "Price Per Night",
+       y = "Booking Likelihood (Average)") +
+  theme_minimal() +
+  theme(legend.position = "bottom")+
+  facet_wrap(~Region)  # Create separate panels for each Region
+  
+  slopes <- Expedia %>%
+  group_by(Region) %>%
+  do(model = lm(`Booked?` ~ PricePerNight, data = .)) %>%
+  summarise(Region = Region,
+            Slope = coef(model)[2])  # Extract the slope (coefficient for PricePerNight)
+
+# Print the slopes
+print(slopes)
+```
+
+# Graph (1c)
+
+```{r}
+# Step 1: Categorize UserIncome into low, medium, and high based on quantiles
+Expedia <- Expedia %>%
+  mutate(IncomeGroup = cut(UserIncome, 
+                           breaks = quantile(UserIncome, probs = c(0, 0.33, 0.66, 1), na.rm = TRUE),
+                           labels = c("Low", "Medium", "High"),
+                           include.lowest = TRUE))
+
+# Step 2: Group data by PricePerNight and IncomeGroup, and calculate average booking
+data_grouped <- Expedia %>%
+  group_by(PricePerNight, IncomeGroup) %>%
+  summarise(AverageBooked = mean(`Booked?`, na.rm = TRUE))
+
+# Step 3: Plot the graph between PricePerNight and AverageBooked, colored by IncomeGroup
+ggplot(data_grouped, aes(x = PricePerNight, y = AverageBooked, color = IncomeGroup)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +  # Add linear regression line without confidence interval
+  labs(title = "Booking Likelihood by Price Per Night for Each Income Group",
+       x = "Price Per Night",
+       y = "Booking Likelihood (Average)") +
+  theme_minimal() +
+  theme(legend.position = "bottom")+
+  facet_wrap(~IncomeGroup)
+
+# Step 4: Calculate slopes for each IncomeGroup
+slopes <- Expedia %>%
+  group_by(IncomeGroup) %>%
+  do(model = lm(`Booked?` ~ PricePerNight, data = .)) %>%
+  summarise(IncomeGroup = IncomeGroup,
+            Slope = coef(model)[2])  # Extract the slope (coefficient for PricePerNight)
+# Print the slopes
+print(slopes)
+
+```
+
+# lm Model 1A
+
+```{r}
+
+summary(lm(`Booked?` ~ PricePerNight, data = Expedia))
+
+```
+# lm Model 1B
+
+```{r}
+
+summary(lm(`Booked?` ~ PricePerNight + factor(Region), data = Expedia))
+
+```
+
+# lm Model 1C
+
+```{r}
+
+summary(lm(`Booked?` ~ PricePerNight + factor(Region) + UserIncome, data = Expedia))
+
+```
+
+# -----------Nights as Dependent Variable-----------
+
+# Graph (2a)
+
+```{r}
+ggplot(Expedia, aes(x = PricePerNight, y = Nights, color = Region)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Number of Nights vs Price Per Night by Region",
+    x = "Price Per Night",
+    y = "Number of Nights"
+  )
+```
+
+# Graph (2b)
+
+```{r}
+data_grouped <- Expedia %>%
+  group_by(PricePerNight, Region) %>%
+  summarise(AverageNights = mean(Nights, na.rm = TRUE))
+
+ggplot(data_grouped, aes(x = PricePerNight, y = AverageNights, color = Region)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +  # Add a linear regression line without the confidence interval
+  labs(title = "Average Number of Nights by Price Per Night for Each Region",
+       x = "Price Per Night",
+       y = "Average Number of Nights") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  facet_wrap(~Region)  # Create separate panels for each Region
+
+# Calculate slopes for each Region
+slopes <- Expedia %>%
+  group_by(Region) %>%
+  do(model = lm(Nights ~ PricePerNight, data = .)) %>%
+  summarise(Region = Region,
+            Slope = coef(model)[2])  # Extract the slope (coefficient for PricePerNight)
+
+# Print the slopes
+print(slopes)
+```
+
+# Graph (2c)
+
+```{r}
+# Step 1: Categorize UserIncome into low, medium, and high based on quantiles
+Expedia <- Expedia %>%
+  mutate(IncomeGroup = cut(UserIncome, 
+                           breaks = quantile(UserIncome, probs = c(0, 0.33, 0.66, 1), na.rm = TRUE),
+                           labels = c("Low", "Medium", "High"),
+                           include.lowest = TRUE))
+
+# Step 2: Group data by PricePerNight and IncomeGroup, and calculate average nights
+data_grouped <- Expedia %>%
+  group_by(PricePerNight, IncomeGroup) %>%
+  summarise(AverageNights = mean(Nights, na.rm = TRUE))
+
+# Step 3: Plot the graph between PricePerNight and AverageNights, colored by IncomeGroup
+ggplot(data_grouped, aes(x = PricePerNight, y = AverageNights, color = IncomeGroup)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +  # Add linear regression line without confidence interval
+  labs(title = "Average Number of Nights by Price Per Night for Each Income Group",
+       x = "Price Per Night",
+       y = "Average Number of Nights") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  facet_wrap(~IncomeGroup)
+
+# Step 4: Calculate slopes for each IncomeGroup
+slopes <- Expedia %>%
+  group_by(IncomeGroup) %>%
+  do(model = lm(Nights ~ PricePerNight, data = .)) %>%
+  summarise(IncomeGroup = IncomeGroup,
+            Slope = coef(model)[2])  # Extract the slope (coefficient for PricePerNight)
+
+# Print the slopes
+print(slopes)
+
+```
+
+# lm Model 2A
+
+```{r}
+
+summary(lm(Nights ~ PricePerNight, data = Expedia))
+
+```
+
+# lm Model 2B
+
+```{r}
+
+summary(lm(Nights ~ PricePerNight + factor(Region), data = Expedia))
+
+```
+
+# lm Model 2C
+
+```{r}
+
+summary(lm(Nights ~ PricePerNight + factor(Region) + UserIncome, data = Expedia))
+
+```
+
